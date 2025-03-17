@@ -1,0 +1,74 @@
+CREATE DATABASE FunerariaDB;
+USE FunerariaDB;
+
+CREATE TABLE Clientes (
+    id_cliente INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    telefono VARCHAR(15),
+    direccion TEXT
+);
+
+CREATE TABLE Servicios_Funerarios (
+    id_servicio INT PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT,
+    nombre_difunto VARCHAR(100) NOT NULL,
+    fecha DATE NOT NULL,
+    tipo_servicio ENUM('Inhumación', 'Cremación') NOT NULL,
+    detalles TEXT,
+    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
+);
+
+CREATE TABLE Seguimiento_Cremacion (
+    id_seguimiento INT PRIMARY KEY AUTO_INCREMENT,
+    id_servicio INT,
+    estado ENUM('Pendiente', 'En proceso', 'Finalizado') NOT NULL,
+    ultima_actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_servicio) REFERENCES Servicios_Funerarios(id_servicio)
+);
+
+CREATE TABLE Planes_Funerarios (
+    id_plan INT PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT,
+    nombre_plan VARCHAR(100) NOT NULL,
+    costo_total DECIMAL(10,2) NOT NULL,
+    mensualidades INT NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
+);
+
+CREATE TABLE Pagos_Planes (
+    id_pago INT PRIMARY KEY AUTO_INCREMENT,
+    id_plan INT,
+    fecha_pago DATE NOT NULL,
+    monto DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (id_plan) REFERENCES Planes_Funerarios(id_plan)
+);
+
+CREATE TABLE Personalizacion_Servicio (
+    id_personalizacion INT PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT,
+    musica VARCHAR(255),
+    flores VARCHAR(255),
+    ataud VARCHAR(255),
+    equipo_velacion VARCHAR(255),
+    tipo_carroza VARCHAR(255),
+    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente)
+);
+
+CREATE TABLE Facturacion (
+    id_factura INT PRIMARY KEY AUTO_INCREMENT,
+    id_cliente INT,
+    id_servicio INT,
+    total DECIMAL(10,2) NOT NULL,
+    fecha_emision DATE NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
+    FOREIGN KEY (id_servicio) REFERENCES Servicios_Funerarios(id_servicio)
+);
+
+CREATE TABLE Reservaciones (
+    id_reservacion INT PRIMARY KEY AUTO_INCREMENT,
+    id_servicio INT,
+    fecha_reserva DATE NOT NULL,
+    notificacion_enviada BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (id_servicio) REFERENCES Servicios_Funerarios(id_servicio)
+);
